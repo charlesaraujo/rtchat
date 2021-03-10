@@ -2,12 +2,19 @@ import React, { useState, useEffect } from 'react';
 import queryString from 'query-string'; 
 import io from 'socket.io-client';
 
+import InfoBar from '../InfoBar/InfoBar';
+import Input from '../Input/Input';
+
+import './Chat.css';
+
 let socket; 
 
 const Chat = ({ location }) => {
     const [ name, setName ] = useState('');
     const [ room, setRoom ] = useState('');
-    const ENDPOINT = 'https://5000-copper-dragon-25o2fs7q.ws-us03.gitpod.io/';
+    const [ message, setMessage ] = useState('');
+    const [ messages, setMessages ] = useState([]);
+    const ENDPOINT = 'https://5000-orange-hippopotamus-bs8do4tl.ws-us03.gitpod.io';
 
     useEffect(() => {
         const { name, room } = queryString.parse(location.search);
@@ -16,11 +23,9 @@ const Chat = ({ location }) => {
 
         setName(name);
         setRoom(room);
-
-        console.log(socket);
         
-        socket.emit('join', {name, room}, ({error}) => {
-            alert(error)
+        socket.emit('join', {name, room}, (error) => {
+            console.log(error)
         });
         
         return () =>{
@@ -31,8 +36,30 @@ const Chat = ({ location }) => {
 
     }, [ENDPOINT, location.search])
 
+    useEffect(() => {
+        socket.on('message', (message) => {
+            setMessages([...messages, message])
+        })
+
+    },[messages]);
+
+    const sendMessage = (event) => {
+        event.preventDefault();
+
+        if(message) {
+            socket.emit('sendMessage', message, () =>setMessage(''))
+        }
+    }
+
+    console.log(message, messages);
+
     return (
-        <h1>Chat</h1>
+        <div className="outerContainer">
+            <div className="container">
+                <InfoBar room={room} />
+                <Input />
+            </div>
+        </div>
     )
 }
 
