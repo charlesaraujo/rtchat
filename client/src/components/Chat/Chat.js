@@ -4,11 +4,17 @@ import io from 'socket.io-client';
 
 import InfoBar from '../InfoBar/InfoBar';
 import Input from '../Input/Input';
+import Messages from '../Messages/Messages';
 
 import './Chat.css';
 
 let socket; 
 
+/**TODO:
+ * Show users in room nicely
+ * resolve disconnect
+ * https://github.com/adrianhajdin/project_chat_application
+ */
 const Chat = ({ location }) => {
     const [ name, setName ] = useState('');
     const [ room, setRoom ] = useState('');
@@ -30,7 +36,7 @@ const Chat = ({ location }) => {
         
         return () =>{
             socket.emit('disconnect');
-
+            console.log("chamei o disconnect");
             socket.off();
         }
 
@@ -51,13 +57,12 @@ const Chat = ({ location }) => {
         }
     }
 
-    console.log(message, messages);
-
     return (
         <div className="outerContainer">
             <div className="container">
                 <InfoBar room={room} />
-                <Input />
+                <Messages messages={messages} name={name} />
+                <Input message={message} setMessage={setMessage} sendMessage={sendMessage} />
             </div>
         </div>
     )
